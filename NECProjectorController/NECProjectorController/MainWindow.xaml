@@ -5,8 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NECProjectorController"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="750" Width="1000" Background="#FF7EADC3">
     <Grid>
-        
+        <Rectangle Fill="#FF1B1B1B" HorizontalAlignment="Left" Height="50" Stroke="Black" VerticalAlignment="Top" Width="{DynamicResource {x:Static SystemParameters.MaximizedPrimaryScreenWidthKey}}">
+            <Rectangle.Effect>
+                <DropShadowEffect BlurRadius="15" Opacity="0.75" Direction="0"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Label x:Name="label" Content="NEC Controller" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="209" Foreground="White" FontFamily="Open Sans" FontSize="24" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+
     </Grid>
 </Window>
