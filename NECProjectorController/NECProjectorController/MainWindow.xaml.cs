@@ -14,9 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace NECProjectorController {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    
+    // Contoller for the main application window
+
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
