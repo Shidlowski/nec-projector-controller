@@ -17,9 +17,6 @@ namespace NECProjectorController {
 
     // Contoller for the main application window
 
-    // activeInput color: #FF5F7D8B
-    // inactiveInput color: #FF41494D
-
     public partial class MainWindow : Window {
         // Brush converter for hex values
         BrushConverter bc = new BrushConverter();
@@ -32,6 +29,9 @@ namespace NECProjectorController {
 
             // Any label/component initialization that is needed
             volumeLabel.Content = "Volume: " + vp.GetVolume();
+
+            if (!vp.GetPowerStatus())
+                projectorStatusLabel.Visibility = Visibility.Visible;
         }
 
         // The event handler for the power button
@@ -45,17 +45,61 @@ namespace NECProjectorController {
             if (ps) {
                 powerButton.Background = (Brush)bc.ConvertFrom("#FF613737");
                 powerButton.Content = "OFF";
-                powerLabel.Content = "Power: On";
+                projectorStatusLabel.Visibility = Visibility.Hidden;
             } else {
                 powerButton.Background = (Brush)bc.ConvertFrom("#FF376150");
                 powerButton.Content = "ON";
-                powerLabel.Content = "Power: Off";
+                projectorStatusLabel.Visibility = Visibility.Visible;
             }
         }
 
         // Handler for any of the input presses
         private void input_Click(object sender, RoutedEventArgs e) {
-            
+
+            // If the projector is powered on, allow control of inputs
+            if (vp.GetPowerStatus()) {
+
+                // Get the Name of the pressed input button
+                string input = (sender as Button).Content.ToString();
+
+                // Change the color of all inputs to the deselected input color
+                foreach (var children in inputWrap.Children) {
+                    (children as Button).Background = (Brush)bc.ConvertFrom("#FF41494D");
+                }
+                // Change selected input to active input
+                (sender as Button).Background = (Brush)bc.ConvertFrom("#FF5F7D8B");
+
+                // Check which input option was pressed, and execute correct commands based on
+                // selected input
+                switch (input) {
+                    case "VGA1":
+                        vp.SetActiveInput(0);
+                        break;
+                    case "VGA2":
+                        vp.SetActiveInput(1);
+                        break;
+                    case "Video":
+                        vp.SetActiveInput(2);
+                        break;
+                    case "Component":
+                        vp.SetActiveInput(3);
+                        break;
+                    case "HDMI1":
+                        vp.SetActiveInput(4);
+                        break;
+                    case "HDMI2":
+                        vp.SetActiveInput(5);
+                        break;
+                    case "LAN/Network":
+                        vp.SetActiveInput(6);
+                        break;
+                    default:
+                        break;
+                }
+
+                // Print active input to the console
+                Console.WriteLine(input + ": " + vp.GetActiveInput());
+            }
         }
 
         // Volume Up Handler
@@ -70,5 +114,13 @@ namespace NECProjectorController {
             volumeLabel.Content = "Volume: " + vp.GetVolume();
         }
 
+        // Volume Mute Handler
+        private void mute_Click(object sender, RoutedEventArgs e) {
+            vp.AlternateMute();
+            if (vp.GetMuteStatus())
+                mutedLabel.Visibility = Visibility.Visible;
+            else
+                mutedLabel.Visibility = Visibility.Hidden;
+        }
     }
 }
