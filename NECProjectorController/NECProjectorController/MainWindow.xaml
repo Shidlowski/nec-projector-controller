@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NECProjectorController"
         mc:Ignorable="d"
-        Title="MainWindow" Height="750" Width="1000" Background="#FF7EADC3">
+        Title="MainWindow" Height="750" Width="600" Background="#FF1A252B">
     <Grid>
         <Rectangle Fill="#FF1B1B1B" HorizontalAlignment="Left" Height="50" Stroke="Black" VerticalAlignment="Top" Width="{DynamicResource {x:Static SystemParameters.MaximizedPrimaryScreenWidthKey}}">
             <Rectangle.Effect>
@@ -13,6 +13,65 @@
             </Rectangle.Effect>
         </Rectangle>
         <Label x:Name="label" Content="NEC Controller" HorizontalAlignment="Left" VerticalAlignment="Top" Height="50" Width="209" Foreground="White" FontFamily="Open Sans" FontSize="24" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+        <Label x:Name="powerLabel" Content="Power: Off" HorizontalAlignment="Left" Margin="20,70,0,0" VerticalAlignment="Top" Width="88" Foreground="White" FontSize="15" Height="20" FontFamily="Open Sans" VerticalContentAlignment="Center" Padding="0"/>
+        <Button x:Name="powerButton" Content="ON" FontFamily="Open Sans" FontSize="20" Click="powerButton_Click" RenderTransformOrigin="1.08,1.107" Background="#FF376150" BorderBrush="{x:Null}" Foreground="White" Margin="20,95,0,0" Width="75" Height="75" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center">
+            <Button.Effect>
+                <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+            </Button.Effect>
+        </Button>
+        <StackPanel HorizontalAlignment="Left" Margin="20,202,0,0" VerticalAlignment="Top" Width="141">
+            <Button x:Name="vga1" Content="VGA1" Height="50" Background="#FF5F7D8B" BorderBrush="{x:Null}" Foreground="White" FontFamily="Open Sans" FontSize="20" Margin="0,10" Click="input_Click">
+                <Button.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+                </Button.Effect>
+            </Button>
+            <Button x:Name="vga2" Content="VGA2" Height="52" Background="#FF41494D" BorderBrush="{x:Null}" Foreground="White" FontFamily="Open Sans" FontSize="20" Margin="0,10" Click="input_Click">
+                <Button.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+                </Button.Effect>
+            </Button>
+            <Button x:Name="video" Content="Video" Height="50" Background="#FF41494D" BorderBrush="{x:Null}" Foreground="White" FontFamily="Open Sans" FontSize="20" Margin="0,10" Click="input_Click">
+                <Button.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+                </Button.Effect>
+            </Button>
+            <Button x:Name="component" Content="Component" Height="50" Background="#FF41494D" BorderBrush="{x:Null}" Foreground="White" FontFamily="Open Sans" FontSize="20" Margin="0,10" Click="input_Click">
+                <Button.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+                </Button.Effect>
+            </Button>
+            <Button x:Name="hdmi1" Content="HDMI 1" Height="50" Background="#FF41494D" BorderBrush="{x:Null}" Foreground="White" FontFamily="Open Sans" FontSize="20" Margin="0,10" Click="input_Click">
+                <Button.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+                </Button.Effect>
+            </Button>
+            <Button x:Name="hdmi2" Content="HDMI 2" Height="50" Background="#FF41494D" BorderBrush="{x:Null}" Foreground="White" FontFamily="Open Sans" FontSize="20" Margin="0,10" Click="input_Click">
+                <Button.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+                </Button.Effect>
+            </Button>
+            <Button x:Name="lan" Content="LAN/Network" Height="52" Background="#FF41494D" BorderBrush="{x:Null}" Foreground="White" FontFamily="Open Sans" FontSize="20" Margin="0,10" Click="input_Click">
+                <Button.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+                </Button.Effect>
+            </Button>
+        </StackPanel>
+        <Label x:Name="inputLabel" Content="Input: VGA 1" HorizontalAlignment="Left" Margin="20,188,0,0" VerticalAlignment="Top" Width="226" Foreground="White" FontSize="15" FontFamily="Open Sans" VerticalContentAlignment="Center" Padding="0"/>
+        <Border BorderThickness="1" HorizontalAlignment="Left" Height="217" Margin="426,95,0,0" VerticalAlignment="Top" Width="142" Background="#FF41494D" CornerRadius="10">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15" Direction="0" Opacity="0.1"/>
+            </Border.Effect>
+            <Grid Margin="-1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="150" Width="75">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="47*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <Button x:Name="volumeUp" Content="+" Height="75" FontFamily="Open Sans" FontSize="36" Width="75" RenderTransformOrigin="3.2,-3.3" BorderBrush="{x:Null}" Click="volumeUp_Click" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-9,0,0" Background="White"/>
+                <Button x:Name="volumeDown" Content="-" Height="75" FontFamily="Open Sans" FontSize="36" Width="75" Background="White" BorderBrush="{x:Null}" Click="volumeDown_Click" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-12" Grid.RowSpan="2"/>
+            </Grid>
+        </Border>
+        <Label x:Name="volumeLabel" Content="Volume: 0" HorizontalAlignment="Left" Margin="426,70,0,0" VerticalAlignment="Top" Width="142" Foreground="White" FontSize="15" Height="20" FontFamily="Open Sans" VerticalContentAlignment="Center" Padding="0" HorizontalContentAlignment="Right"/>
+
 
     </Grid>
 </Window>
