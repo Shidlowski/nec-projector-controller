@@ -20,12 +20,12 @@ namespace NECProjectorController {
     public partial class MainWindow : Window {
         // Brush converter for hex values
         BrushConverter bc = new BrushConverter();
-
-        private VirtualProjector vp = new VirtualProjector();
+        private VirtualProjector vp;
 
         // Initialization
         public MainWindow() {
             InitializeComponent();
+            vp = new VirtualProjector();
 
             // Any label/component initialization that is needed
             volumeLabel.Content = "Volume: " + vp.GetVolume();
@@ -137,15 +137,8 @@ namespace NECProjectorController {
                 mutedLabel.Visibility = Visibility.Hidden;
         }
 
-        // Reconnect to the Projector/TCP Server, set the correct Projector 
-        // status label
-        private void connectButton_Click(object sender, RoutedEventArgs e) {
-            vp.Connect();
-
-            if(vp.GetConnectionStatus()) {
-                projectorStatusLabel.Content = "Projector is Off";
-                projectorStatusLabel.Visibility = Visibility.Visible;
-            }
+        // Refresh the controller, ie: found connection, recheck lamp hours
+        private void refreshButton_Click(object sender, RoutedEventArgs e) {
 
         }
     }

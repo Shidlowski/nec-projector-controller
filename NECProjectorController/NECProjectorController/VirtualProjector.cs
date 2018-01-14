@@ -18,10 +18,11 @@ namespace NECProjectorController {
         private bool projectorConnected;
 
         // Create the connection to the TCP Server
-        private Connection conn = Connection.GetInstance();
+        private Connection conn;
 
         // Constructor
         public VirtualProjector() {
+            conn = Connection.GetInstance();
 
             // Set the connection status
             if (conn.isConnected) 
@@ -63,17 +64,6 @@ namespace NECProjectorController {
 
         // Get the status of the projector
         public bool GetConnectionStatus() => projectorConnected;
-
-        // Try to connect to the projector/tcpserver
-        // Then set the correct projector status
-        public void Connect() {
-            conn.Connect();
-
-            if (conn.isConnected)
-                projectorConnected = true;
-            else
-                projectorConnected = false;
-        }
 
         // Simply prints the state of the printer to the console
         public void PrintState() {

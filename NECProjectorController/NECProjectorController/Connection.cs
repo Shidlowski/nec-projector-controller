@@ -13,7 +13,6 @@ namespace NECProjectorController {
         // Create the singleton object
         private static Connection conn;
         private int PORT = 7142;
-
         public Boolean isConnected;
 
         // TCP Services
@@ -33,14 +32,22 @@ namespace NECProjectorController {
 
             client = new TcpClient();
 
-            try { 
-                client.Connect(endpoint);
-                Console.WriteLine("Connected to projector...");
-                isConnected = true;
-            }
-            catch(System.Net.Sockets.SocketException) {
-                Console.WriteLine("Unable to make a connection, the emulator may not be running...");
-                isConnected = false;
+            // Need a new thread to look for connections
+            System.Threading.Thread connThread;
+            connThread = new System.Threading.Thread(new System.Threading.ThreadStart(StartConnection));
+            connThread.Start();
+        }
+
+        private void StartConnection() {
+            isConnected = false;
+            while (!isConnected) {
+                try {
+                    client.Connect(endpoint);
+                    Console.WriteLine("Connected to projector...");
+                    isConnected = true;
+                } catch (System.Net.Sockets.SocketException) {
+                    Console.WriteLine("Looking for connection...");
+                }
             }
         }
 
@@ -50,20 +57,6 @@ namespace NECProjectorController {
                 conn = new Connection();
             }
             return conn;
-        }
-
-        // Try to Connect to the Projector/Tcp Server
-        // useful if the server was not started before the 
-        // controller
-        public void Connect() {
-            try {
-                client.Connect(endpoint);
-                Console.WriteLine("Connected to projector...");
-                isConnected = true;
-            } catch (System.Net.Sockets.SocketException) {
-                Console.WriteLine("Unable to make a connection, the emulator may not be running...");
-                isConnected = false;
-            }
         }
 
         // Test send message
