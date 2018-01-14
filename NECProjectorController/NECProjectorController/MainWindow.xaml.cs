@@ -32,6 +32,9 @@ namespace NECProjectorController {
 
             if (!vp.GetPowerStatus())
                 projectorStatusLabel.Visibility = Visibility.Visible;
+
+            // Make the mutedLabel hidden on startup, could do this with XAML, but I needed to see it in the editor
+            mutedLabel.Visibility = Visibility.Hidden;
         }
 
         // The event handler for the power button

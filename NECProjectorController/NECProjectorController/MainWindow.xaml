@@ -73,12 +73,10 @@
         </Border>
         <Label x:Name="volumeLabel" Content="Volume: 0" HorizontalAlignment="Left" Margin="386,70,0,0" VerticalAlignment="Top" Width="142" Foreground="White" FontSize="15" Height="20" FontFamily="Open Sans" VerticalContentAlignment="Center" Padding="0" HorizontalContentAlignment="Right"/>
         <Label x:Name="projectorStatusLabel" Content="Projector is Off" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Bottom" Width="592" Background="#FF6C0D0D" Foreground="White" FontFamily="Open Sans" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-        <Label x:Name="mutedLabel" Content="*Muted" HorizontalAlignment="Left" Margin="424,392,0,0" VerticalAlignment="Top" Width="104" Foreground="White" Background="{x:Null}" FontFamily="Open Sans" FontSize="14" Padding="0" Visibility="Hidden"/>
-        <Border BorderThickness="1" HorizontalAlignment="Left" Height="322" Margin="278,404,0,0" VerticalAlignment="Top" Width="250" Background="#FF526F78" CornerRadius="2">
-            <StackPanel>
-                <Label x:Name="statusLabel" Content="Projector Status" Foreground="White" FontFamily="Open Sans" FontSize="14"/>
-            </StackPanel>
-        </Border>
+        <Label x:Name="mutedLabel" Content="*Muted" HorizontalAlignment="Left" Margin="424,389,0,0" VerticalAlignment="Top" Width="104" Foreground="White" Background="{x:Null}" FontFamily="Open Sans" FontSize="10" Padding="0"/>
+        <Label x:Name="lampHoursLabel" Content="Lamp Hours: 0" HorizontalAlignment="Left" Margin="386,466,0,0" VerticalAlignment="Top" Width="142" Foreground="White" FontSize="15" Height="20" FontFamily="Open Sans" VerticalContentAlignment="Center" Padding="0" HorizontalContentAlignment="Right"/>
+        <Button x:Name="refreshButton" Content="Refresh" HorizontalAlignment="Left" Margin="424,504,0,0" VerticalAlignment="Top" Width="104" Background="White" BorderBrush="{x:Null}" Height="50" FontFamily="Open Sans" FontSize="20"/>
+        <Button x:Name="reconnectButton" Content="Reconnect" HorizontalAlignment="Left" Margin="424,674,0,0" VerticalAlignment="Top" Width="104" Background="White" BorderBrush="{x:Null}" Height="50" FontFamily="Open Sans" FontSize="20"/>
 
 
     </Grid>

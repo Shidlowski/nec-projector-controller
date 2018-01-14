@@ -17,7 +17,7 @@ namespace NECProjectorController {
         private int volume = 20;
 
         // Create the connection to the TCP Server
-        private Connection con = new Connection();
+        private Connection conn = Connection.GetInstance();
 
         // Constructor
         public VirtualProjector() { }
