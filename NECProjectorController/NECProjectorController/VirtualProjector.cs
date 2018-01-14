@@ -24,12 +24,10 @@ namespace NECProjectorController {
         public VirtualProjector() {
             conn = Connection.GetInstance();
 
-            // Set the connection status
-            if (conn.isConnected) 
-                projectorConnected = true;
-            else
+            if(!conn.isConnected) 
                 projectorConnected = false;
-
+            else
+                projectorConnected = true;
         }
 
         // Get/Set for powerStatus
@@ -63,7 +61,14 @@ namespace NECProjectorController {
         public bool GetMuteStatus() => isMuted;
 
         // Get the status of the projector
-        public bool GetConnectionStatus() => projectorConnected;
+        public bool GetConnectionStatus() {
+            if (conn.isConnected)
+                projectorConnected = true;
+            else
+                projectorConnected = false;
+
+            return projectorConnected;
+        }
 
         // Simply prints the state of the printer to the console
         public void PrintState() {

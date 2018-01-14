@@ -41,7 +41,7 @@ namespace NECProjectorController {
 
             // Check if there is a connection to the projector
             if(!vp.GetConnectionStatus()) {
-                projectorStatusLabel.Content = "No Connection Detected";
+                projectorStatusLabel.Content = "No Connection Detected (Start Projector, then Refresh)";
                 projectorStatusLabel.Visibility = Visibility.Visible;
             }
         }
@@ -139,7 +139,12 @@ namespace NECProjectorController {
 
         // Refresh the controller, ie: found connection, recheck lamp hours
         private void refreshButton_Click(object sender, RoutedEventArgs e) {
-
+            if (vp.GetConnectionStatus()) {
+                if(vp.GetPowerStatus()) 
+                    projectorStatusLabel.Visibility = Visibility.Hidden;
+                else
+                    projectorStatusLabel.Content = "Projector is Off";
+            }
         }
     }
 }

@@ -38,6 +38,7 @@ namespace NECProjectorController {
             connThread.Start();
         }
 
+        // Called through the new thread, runs until a projector is connected
         private void StartConnection() {
             isConnected = false;
             while (!isConnected) {
