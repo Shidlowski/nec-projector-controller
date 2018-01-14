@@ -15,12 +15,21 @@ namespace NECProjectorController {
         private int activeInput = 0;
         private bool isMuted = false;
         private int volume = 20;
+        private bool projectorConnected;
 
         // Create the connection to the TCP Server
         private Connection conn = Connection.GetInstance();
 
         // Constructor
-        public VirtualProjector() { }
+        public VirtualProjector() {
+
+            // Set the connection status
+            if (conn.isConnected) 
+                projectorConnected = true;
+            else
+                projectorConnected = false;
+
+        }
 
         // Get/Set for powerStatus
         public bool GetPowerStatus() => powerStatus;
@@ -44,12 +53,27 @@ namespace NECProjectorController {
             if(powerStatus)
                 volume -= 1;
         }
-
+        
+        // Handle the muteStatus
         public void AlternateMute() {
             if(powerStatus)
                 isMuted = !isMuted;
         }
         public bool GetMuteStatus() => isMuted;
+
+        // Get the status of the projector
+        public bool GetConnectionStatus() => projectorConnected;
+
+        // Try to connect to the projector/tcpserver
+        // Then set the correct projector status
+        public void Connect() {
+            conn.Connect();
+
+            if (conn.isConnected)
+                projectorConnected = true;
+            else
+                projectorConnected = false;
+        }
 
         // Simply prints the state of the printer to the console
         public void PrintState() {

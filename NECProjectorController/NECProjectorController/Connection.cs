@@ -14,6 +14,8 @@ namespace NECProjectorController {
         private static Connection conn;
         private int PORT = 7142;
 
+        public Boolean isConnected;
+
         // TCP Services
         byte[] data;
         NetworkStream stream;
@@ -34,24 +36,43 @@ namespace NECProjectorController {
             try { 
                 client.Connect(endpoint);
                 Console.WriteLine("Connected to projector...");
-
-                message = "Hello";
-                Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
-
-                stream = client.GetStream();
-                stream.Write(data, 0, data.Length);
+                isConnected = true;
             }
             catch(System.Net.Sockets.SocketException) {
                 Console.WriteLine("Unable to make a connection, the emulator may not be running...");
+                isConnected = false;
             }
         }
 
         // Singleton get instance
         public static Connection GetInstance() {
-            if(conn == null) {
+            if (conn == null) {
                 conn = new Connection();
             }
             return conn;
+        }
+
+        // Try to Connect to the Projector/Tcp Server
+        // useful if the server was not started before the 
+        // controller
+        public void Connect() {
+            try {
+                client.Connect(endpoint);
+                Console.WriteLine("Connected to projector...");
+                isConnected = true;
+            } catch (System.Net.Sockets.SocketException) {
+                Console.WriteLine("Unable to make a connection, the emulator may not be running...");
+                isConnected = false;
+            }
+        }
+
+        // Test send message
+        public void SendHello() {
+            message = "Hello";
+            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+
+            stream = client.GetStream();
+            stream.Write(data, 0, data.Length);
         }
     }
 }

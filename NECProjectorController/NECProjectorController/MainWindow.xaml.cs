@@ -30,29 +30,40 @@ namespace NECProjectorController {
             // Any label/component initialization that is needed
             volumeLabel.Content = "Volume: " + vp.GetVolume();
 
-            if (!vp.GetPowerStatus())
+            // If there is no power, set the label to visible
+            if (!vp.GetPowerStatus()) {
+                projectorStatusLabel.Content = "Projector is Off";
                 projectorStatusLabel.Visibility = Visibility.Visible;
+            }
 
             // Make the mutedLabel hidden on startup, could do this with XAML, but I needed to see it in the editor
             mutedLabel.Visibility = Visibility.Hidden;
+
+            // Check if there is a connection to the projector
+            if(!vp.GetConnectionStatus()) {
+                projectorStatusLabel.Content = "No Connection Detected";
+                projectorStatusLabel.Visibility = Visibility.Visible;
+            }
         }
 
         // The event handler for the power button
         private void powerButton_Click(object sender, RoutedEventArgs e) {
-            bool ps = vp.GetPowerStatus(); // Temporary holder for the powerStatus
-            ps = !ps; // Alternate power status
+            if(vp.GetConnectionStatus()) {
+                bool ps = vp.GetPowerStatus(); // Temporary holder for the powerStatus
+                ps = !ps; // Alternate power status
 
-            vp.SetPowerStatus(ps); // Change the powerStatus in the virtual object
+                vp.SetPowerStatus(ps); // Change the powerStatus in the virtual object
 
-            // Set the appearance of the power button (Brush)bc.ConvertFrom("#FFXXXXXX")
-            if (ps) {
-                powerButton.Background = (Brush)bc.ConvertFrom("#FF613737");
-                powerButton.Content = "OFF";
-                projectorStatusLabel.Visibility = Visibility.Hidden;
-            } else {
-                powerButton.Background = (Brush)bc.ConvertFrom("#FF376150");
-                powerButton.Content = "ON";
-                projectorStatusLabel.Visibility = Visibility.Visible;
+                // Set the appearance of the power button (Brush)bc.ConvertFrom("#FFXXXXXX")
+                if (ps) {
+                    powerButton.Background = (Brush)bc.ConvertFrom("#FF613737");
+                    powerButton.Content = "OFF";
+                    projectorStatusLabel.Visibility = Visibility.Hidden;
+                } else {
+                    powerButton.Background = (Brush)bc.ConvertFrom("#FF376150");
+                    powerButton.Content = "ON";
+                    projectorStatusLabel.Visibility = Visibility.Visible;
+                }
             }
         }
 
@@ -124,6 +135,18 @@ namespace NECProjectorController {
                 mutedLabel.Visibility = Visibility.Visible;
             else
                 mutedLabel.Visibility = Visibility.Hidden;
+        }
+
+        // Reconnect to the Projector/TCP Server, set the correct Projector 
+        // status label
+        private void connectButton_Click(object sender, RoutedEventArgs e) {
+            vp.Connect();
+
+            if(vp.GetConnectionStatus()) {
+                projectorStatusLabel.Content = "Projector is Off";
+                projectorStatusLabel.Visibility = Visibility.Visible;
+            }
+
         }
     }
 }
