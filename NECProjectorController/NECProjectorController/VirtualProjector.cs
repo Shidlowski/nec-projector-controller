@@ -20,11 +20,11 @@ namespace NECProjectorController {
         // Create the connection to the TCP Server
         private Connection conn;
 
-        // Constructor
+        // Constructor, creates a new connection
         public VirtualProjector() {
             conn = Connection.GetInstance();
 
-            if(!conn.isConnected) 
+            if(!conn.IsConnected) 
                 projectorConnected = false;
             else
                 projectorConnected = true;
@@ -60,23 +60,14 @@ namespace NECProjectorController {
         }
         public bool GetMuteStatus() => isMuted;
 
-        // Get the status of the projector
+        // Get the connection status of the controller to the emulator
         public bool GetConnectionStatus() {
-            if (conn.isConnected)
+            if (conn.IsConnected)
                 projectorConnected = true;
             else
                 projectorConnected = false;
 
             return projectorConnected;
         }
-
-        // Simply prints the state of the printer to the console
-        public void PrintState() {
-            Console.WriteLine("Power: " + powerStatus);
-            Console.WriteLine("Active Input: " + activeInput);
-            Console.WriteLine("Volume: " + volume);
-            Console.WriteLine("Is Muted: " + isMuted);
-        }
-
     }
 }

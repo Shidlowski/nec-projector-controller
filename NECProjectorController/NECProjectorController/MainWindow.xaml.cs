@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,37 +13,61 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace NECProjectorController {
 
     // Contoller for the main application window
 
     public partial class MainWindow : Window {
+
         // Brush converter for hex values
         BrushConverter bc = new BrushConverter();
-        private VirtualProjector vp;
+        private static VirtualProjector vp;
+        private DispatcherTimer dispatcherTimer;
 
         // Initialization
         public MainWindow() {
             InitializeComponent();
+
+            // Create the virtual projector
             vp = new VirtualProjector();
 
             // Any label/component initialization that is needed
             volumeLabel.Content = "Volume: " + vp.GetVolume();
 
-            // If there is no power, set the label to visible
-            if (!vp.GetPowerStatus()) {
-                projectorStatusLabel.Content = "Projector is Off";
-                projectorStatusLabel.Visibility = Visibility.Visible;
-            }
-
-            // Make the mutedLabel hidden on startup, could do this with XAML, but I needed to see it in the editor
+            // isMuted is Off normally -- set here so that I can see the label in the editor
             mutedLabel.Visibility = Visibility.Hidden;
+        }
 
-            // Check if there is a connection to the projector
-            if(!vp.GetConnectionStatus()) {
-                projectorStatusLabel.Content = "No Connection Detected (Start Projector, then Refresh)";
+        // On window load
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            // Check for a TCP Connection
+            CheckConnection();
+
+            // Initialize the timer
+            dispatcherTimer = new DispatcherTimer();
+
+            // Check every second for a connection (if there isn't one)
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
+
+        }
+
+        // Timer event handler -- Only serves to check for a connection
+        private void dispatcherTimer_Tick(object sender, EventArgs e) {
+            CheckConnection();
+        }
+
+        // Check the connection status
+        private void CheckConnection() {
+            if (!vp.GetPowerStatus()) {
                 projectorStatusLabel.Visibility = Visibility.Visible;
+                if (!vp.GetConnectionStatus())
+                    projectorStatusLabel.Content = "No Connection Detected (Start Projector)";
+                else
+                    projectorStatusLabel.Content = "Projector is Off";
             }
         }
 
@@ -52,7 +77,8 @@ namespace NECProjectorController {
                 bool ps = vp.GetPowerStatus(); // Temporary holder for the powerStatus
                 ps = !ps; // Alternate power status
 
-                vp.SetPowerStatus(ps); // Change the powerStatus in the virtual object
+                // Change the powerStatus in the virtual object
+                vp.SetPowerStatus(ps);
 
                 // Set the appearance of the power button (Brush)bc.ConvertFrom("#FFXXXXXX")
                 if (ps) {
@@ -137,14 +163,9 @@ namespace NECProjectorController {
                 mutedLabel.Visibility = Visibility.Hidden;
         }
 
-        // Refresh the controller, ie: found connection, recheck lamp hours
+        // Refresh
         private void refreshButton_Click(object sender, RoutedEventArgs e) {
-            if (vp.GetConnectionStatus()) {
-                if(vp.GetPowerStatus()) 
-                    projectorStatusLabel.Visibility = Visibility.Hidden;
-                else
-                    projectorStatusLabel.Content = "Projector is Off";
-            }
+
         }
     }
 }

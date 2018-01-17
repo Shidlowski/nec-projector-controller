@@ -13,7 +13,17 @@ namespace NECProjectorController {
         // Create the singleton object
         private static Connection conn;
         private int PORT = 7142;
-        public Boolean isConnected;
+
+        // isConnected Properties notify the MainWindow once
+        // the connection status updates
+        private bool isConnected;
+        public bool IsConnected {
+            get { return isConnected; }
+            set {
+                isConnected = value;
+                Console.WriteLine("Connection status changed");
+            }
+        }
 
         // TCP Services
         byte[] data;
@@ -38,20 +48,6 @@ namespace NECProjectorController {
             connThread.Start();
         }
 
-        // Called through the new thread, runs until a projector is connected
-        private void StartConnection() {
-            isConnected = false;
-            while (!isConnected) {
-                try {
-                    client.Connect(endpoint);
-                    Console.WriteLine("Connected to projector...");
-                    isConnected = true;
-                } catch (System.Net.Sockets.SocketException) {
-                    Console.WriteLine("Looking for connection...");
-                }
-            }
-        }
-
         // Singleton get instance
         public static Connection GetInstance() {
             if (conn == null) {
@@ -60,13 +56,18 @@ namespace NECProjectorController {
             return conn;
         }
 
-        // Test send message
-        public void SendHello() {
-            message = "Hello";
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
-
-            stream = client.GetStream();
-            stream.Write(data, 0, data.Length);
+        // Called through the new thread, runs until a projector is connected
+        private void StartConnection() {
+            isConnected = false;
+            while (!isConnected) {
+                try {
+                    client.Connect(endpoint);
+                    Console.WriteLine("Connected to projector...");
+                    IsConnected = true;
+                } catch (System.Net.Sockets.SocketException) {
+                    Console.WriteLine("Searching for connection...");
+                }
+            }
         }
     }
 }
