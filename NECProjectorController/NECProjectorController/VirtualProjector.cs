@@ -17,6 +17,10 @@ namespace NECProjectorController {
         private int volume = 20;
         private bool projectorConnected;
 
+        // Byte array commands
+        private byte[] powerOn = new byte[] { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 };
+        private byte[] powerOff = new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 };
+
         // Create the connection to the TCP Server
         private Connection conn;
 
@@ -32,7 +36,17 @@ namespace NECProjectorController {
 
         // Get/Set for powerStatus
         public bool GetPowerStatus() => powerStatus;
-        public void SetPowerStatus(bool ps) { this.powerStatus = ps; }
+        public void SetPowerStatus(bool ps) {
+            this.powerStatus = ps;
+            
+            // Send the power message
+            if(this.powerStatus) {
+                conn.SendMessage(powerOn);
+            }
+            else {
+                conn.SendMessage(powerOff);
+            }
+        }
 
         // Get/Set for activeInput
         public int GetActiveInput() => activeInput;

@@ -21,22 +21,18 @@ namespace NECProjectorController {
             get { return isConnected; }
             set {
                 isConnected = value;
-                Console.WriteLine("Connection status changed");
             }
         }
 
         // TCP Services
-        byte[] data;
-        NetworkStream stream;
-        string message;
+        private byte[] data;
+        private NetworkStream stream;
         TcpClient client;
         IPAddress ipAddress;
         IPEndPoint endpoint;
 
         // Singleton constructor
         private Connection() {
-            data = new byte[1024];
-            
             ipAddress = IPAddress.Parse("127.0.0.1");
             endpoint = new IPEndPoint(ipAddress, PORT);
 
@@ -68,6 +64,12 @@ namespace NECProjectorController {
                     Console.WriteLine("Searching for connection...");
                 }
             }
+        }
+
+        // Send a message on to the projector
+        public void SendMessage(byte[] command) {
+            stream = client.GetStream();
+            stream.Write(command, 0, command.Length);
         }
     }
 }
