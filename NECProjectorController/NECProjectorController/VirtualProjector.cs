@@ -17,12 +17,30 @@ namespace NECProjectorController {
         private int volume = 20;
         private bool projectorConnected;
 
-        // Byte array commands
-        private byte[] powerOn = new byte[] { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 };
-        private byte[] powerOff = new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 };
-
         // Create the connection to the TCP Server
         private Connection conn;
+
+        // List of input data, used in the input command
+        public enum InputList {
+            VGA1 = 0x01,
+            VGA2 = 0x02,
+            Video1 = 0x06,
+            YPbPr = 0x10,
+            HDMI1 = 0x1A,
+            HDMI2 = 0x1B,
+            HDBaseT = 0x20
+        };
+
+        // List of byte arrays for the commands
+        private List<byte[]> commands = new List<byte[]>() {
+            new byte[] { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 },   // Power On 0
+            new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 },   // Power Off 1
+            new byte[] { 0x02, 0x03, 0x00, 0x00, 0x02 /* DATA */ }, // Input change -> append the data in the data slot 2
+            new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },   // Mute On 3
+            new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },   // Mute Off 4
+            new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, /* Volume Byte */0x0A, 0x00, 0x27 }, // Volume Adjust -> append the data in the data slot 5
+            new byte[] { 0x03, 0x8C, 0x00, 0x00, 0x00, 0x8F } // Lamp Information Request 6
+        };
 
         // Constructor, creates a new connection
         public VirtualProjector() {
@@ -41,10 +59,10 @@ namespace NECProjectorController {
             
             // Send the power message
             if(this.powerStatus) {
-                conn.SendMessage(powerOn);
+                conn.SendMessage(commands[0]);
             }
             else {
-                conn.SendMessage(powerOff);
+                conn.SendMessage(commands[1]);
             }
         }
 
@@ -59,18 +77,37 @@ namespace NECProjectorController {
         // Power needs to be on, *can still change volume is the system is muted
         public int GetVolume() => volume;
         public void IncrementVolume() {
-            if(powerStatus)
+            if (powerStatus) {
                 volume += 1;
+                SetVolume();
+            }
         }
         public void DecrementVolume() {
-            if(powerStatus)
+            if (powerStatus) {
                 volume -= 1;
+                SetVolume();
+            }
         }
-        
+        // Set the volume
+        private void SetVolume() {
+            // Volume byte is found at 8
+            byte[] volumeCommand = commands[5];
+
+            // Set the volume byte to the correct volume
+            // volumeCommand[8] = volume hex byte;
+
+            conn.SendMessage(volumeCommand);
+        }
+
         // Handle the muteStatus
         public void AlternateMute() {
-            if(powerStatus)
+            if(powerStatus) { 
                 isMuted = !isMuted;
+                if (isMuted)
+                    conn.SendMessage(commands[3]);
+                else
+                    conn.SendMessage(commands[4]);
+            }
         }
         public bool GetMuteStatus() => isMuted;
 
