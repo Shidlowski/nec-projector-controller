@@ -33,13 +33,13 @@ namespace NECProjectorController {
 
         // List of byte arrays for the commands
         private List<byte[]> commands = new List<byte[]>() {
-            new byte[] { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 },   // Power On 0
-            new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 },   // Power Off 1
-            new byte[] { 0x02, 0x03, 0x00, 0x00, 0x02 /* DATA */ }, // Input change -> append the data in the data slot 2
-            new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },   // Mute On 3
-            new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },   // Mute Off 4
-            new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, /* Volume Byte */0x0A, 0x00, 0x27 }, // Volume Adjust -> append the data in the data slot 5
-            new byte[] { 0x03, 0x8C, 0x00, 0x00, 0x00, 0x8F } // Lamp Information Request 6
+            new byte[] { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 },   // Power On 
+            new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 },   // Power Off 
+            new byte[] { 0x02, 0x03, 0x00, 0x00, 0x02/*, DATA */ }, // Input change 
+            new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },   // Mute On 
+            new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },   // Mute Off 
+            new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00 }, // Volume Adjust
+            new byte[] { 0x03, 0x8C, 0x00, 0x00, 0x00, 0x8F } // Lamp Information Request 
         };
 
         // Constructor, creates a new connection
@@ -94,7 +94,7 @@ namespace NECProjectorController {
             byte[] volumeCommand = commands[5];
 
             // Set the volume byte and checksum to the correct volume
-            if (volume > 0) {
+            if (volume > 0 && !isMuted) {
 
                 // Get volume byte
                 string v = volume.ToString("X2");
@@ -107,6 +107,7 @@ namespace NECProjectorController {
                 
                 // Send message
                 conn.SendMessage(volumeCommand);
+
             }
         }
 
@@ -116,8 +117,12 @@ namespace NECProjectorController {
                 isMuted = !isMuted;
                 if (isMuted)
                     conn.SendMessage(commands[3]);
-                else
+                else {
                     conn.SendMessage(commands[4]);
+
+                    // Since we're unmuting, we want to set the volume in case any changes were made during the mute process
+                    SetVolume();
+                }
             }
         }
         public bool GetMuteStatus() => isMuted;
