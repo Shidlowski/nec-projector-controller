@@ -75,7 +75,7 @@ namespace NECProjectorController {
                 if (i + 1 == command.Length)
                     Console.Write(command[i].ToString("X2") + "\n");
                 else
-                    Console.Write(command[i].ToString("X2") + ", ");
+                    Console.Write(command[i].ToString("X2") + " ");
             }
 
             stream = client.GetStream();
