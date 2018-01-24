@@ -77,13 +77,13 @@ namespace NECProjectorController {
         // Power needs to be on, *can still change volume is the system is muted
         public int GetVolume() => volume;
         public void IncrementVolume() {
-            if (powerStatus) {
+            if (powerStatus && volume != 100) {
                 volume += 1;
                 SetVolume();
             }
         }
         public void DecrementVolume() {
-            if (powerStatus) {
+            if (powerStatus && volume != 0) {
                 volume -= 1;
                 SetVolume();
             }
@@ -93,10 +93,21 @@ namespace NECProjectorController {
             // Volume byte is found at 8
             byte[] volumeCommand = commands[5];
 
-            // Set the volume byte to the correct volume
-            // volumeCommand[8] = volume hex byte;
+            // Set the volume byte and checksum to the correct volume
+            if (volume > 0) {
 
-            conn.SendMessage(volumeCommand);
+                // Get volume byte
+                string v = volume.ToString("X2");
+                byte vol = Convert.ToByte(v, 16);
+                volumeCommand[8] = vol;
+
+                // Get checksum byte
+                byte check = GetChecksum(volumeCommand);
+                volumeCommand[10] = check;
+                
+                // Send message
+                conn.SendMessage(volumeCommand);
+            }
         }
 
         // Handle the muteStatus
@@ -119,6 +130,14 @@ namespace NECProjectorController {
                 projectorConnected = false;
 
             return projectorConnected;
+        }
+
+        // Get the checksum
+        private byte GetChecksum(byte[] command) {
+            byte checksum = 0;
+            for (int i = 0; i < command.Length - 1; i++)
+                checksum += command[i];
+            return checksum;
         }
     }
 }

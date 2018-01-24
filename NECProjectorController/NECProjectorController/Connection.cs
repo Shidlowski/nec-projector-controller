@@ -68,8 +68,18 @@ namespace NECProjectorController {
 
         // Send a message on to the projector
         public void SendMessage(byte[] command) {
+
+            // Print the command being sent to the projector
+            Console.Write("\nCommand: ");
+            for (int i = 0; i < command.Length; i++) {
+                if (i + 1 == command.Length)
+                    Console.Write(command[i].ToString("X2") + "\n");
+                else
+                    Console.Write(command[i].ToString("X2") + ", ");
+            }
+
             stream = client.GetStream();
-            stream.Write(command, 0, command.Length);
+            stream.Write(command, offset: 0, size: command.Length);
         }
     }
 }
