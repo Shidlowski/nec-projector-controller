@@ -81,5 +81,10 @@ namespace NECProjectorController {
             stream = client.GetStream();
             stream.Write(command, offset: 0, size: command.Length);
         }
+
+        // Recieve a TCP Response
+        public void RecieveMessage() {
+
+        }
     }
 }

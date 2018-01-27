@@ -11,7 +11,6 @@ namespace NECProjectorController {
 
         // Instance Variables
         private bool powerStatus = false;
-        private int[] input = new int[] { 0, 1, 2, 3, 4, 5, 6 }; // VGA1, VGA2, Video, Component, HDMI1, HDMI2, LAN/Network
         private int activeInput = 0;
         private bool isMuted = false;
         private int volume = 20;
@@ -24,18 +23,18 @@ namespace NECProjectorController {
         public enum InputList {
             VGA1 = 0x01,
             VGA2 = 0x02,
-            Video1 = 0x06,
-            YPbPr = 0x10,
+            Video = 0x06,
+            Component = 0x10,
             HDMI1 = 0x1A,
             HDMI2 = 0x1B,
-            HDBaseT = 0x20
+            LAN = 0x20
         };
 
         // List of byte arrays for the commands
         private List<byte[]> commands = new List<byte[]>() {
             new byte[] { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 },   // Power On 
             new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 },   // Power Off 
-            new byte[] { 0x02, 0x03, 0x00, 0x00, 0x02/*, DATA */ }, // Input change 
+            new byte[] { 0x02, 0x03, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00 }, // Input change 
             new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },   // Mute On 
             new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },   // Mute Off 
             new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00 }, // Volume Adjust
@@ -69,8 +68,40 @@ namespace NECProjectorController {
         // Get/Set for activeInput
         public int GetActiveInput() => activeInput;
         public void SetActiveInput(int activeInput) {
-            if(powerStatus)
+            if (powerStatus) {
                 this.activeInput = activeInput;
+                byte[] message = commands[2];
+                switch(activeInput) {
+                    case 0: // VGA 1 
+                        message[6] = (byte)InputList.VGA1;
+                        break;
+                    case 1: // VGA 2
+                        message[6] = (byte)InputList.VGA2;
+                        break;
+                    case 3: // Video
+                        message[6] = (byte)InputList.Video;
+                        break;
+                    case 4: // Component
+                        message[6] = (byte)InputList.Component;
+                        break;
+                    case 5: // HDMI 1
+                        message[6] = (byte)InputList.HDMI1;
+                        break;
+                    case 6: // HDMI 2
+                        message[6] = (byte)InputList.HDMI2;
+                        break;
+                    case 7: // LAN/Network
+                        message[6] = (byte)InputList.LAN;
+                        break;
+                    default:
+                        break;
+                        
+                }
+
+                // Set checksum, send message
+                message[7] = GetChecksum(message);
+                conn.SendMessage(message);
+            }
         }
 
         // Get & increment/decrement for Volume
