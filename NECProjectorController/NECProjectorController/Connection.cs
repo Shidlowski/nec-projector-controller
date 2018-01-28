@@ -69,12 +69,6 @@ namespace NECProjectorController {
             }
         }
 
-        // Send a message on to the projector
-        public void SendMessage(byte[] command) {
-            stream = client.GetStream();
-            stream.Write(command, offset: 0, size: command.Length);
-        }
-
         // Check the connection and set the IsConnected
         public bool GetConnectionStatus() {
 
@@ -83,13 +77,13 @@ namespace NECProjectorController {
                 if (client.Client.Poll(0, SelectMode.SelectRead)) {
                     byte[] checkConn = new byte[1];
                     if (client.Client.Receive(checkConn, SocketFlags.Peek) == 0) {
+                        client.Client.Disconnect(true);
                         IsConnected = false;
                     } else {
                         IsConnected = true;
                     }
                 }
-            }
-            catch(System.Net.Sockets.SocketException) {
+            } catch (System.Net.Sockets.SocketException) {
                 client.Client.Disconnect(true); // Disconnect the TCP Client (to allow reconnection)
                 IsConnected = false;
             }
@@ -97,9 +91,44 @@ namespace NECProjectorController {
             return IsConnected;
         }
 
-        // Recieve a TCP Response
-        public void RecieveMessage() {
-            
+        // Send a message on to the projector
+        public void SendMessage(byte[] command) {
+            stream = client.GetStream();
+            stream.Write(command, offset: 0, size: command.Length);
+        }
+
+        // Recieve a TCP Response from the server
+        public byte[] RecieveMessage() {
+            byte[] data = new byte[1024];
+
+            stream = client.GetStream();
+            stream.Read(data, 0, data.Length);
+
+            // Get the ending index of the message
+            int zeroCount = 0;
+            int lastNonZero = 0;
+            for (int i = 0; i < data.Length; i++) {
+                if (data[i] == 0)
+                    zeroCount++;
+                else {
+                    lastNonZero = i;
+                    zeroCount = 0;
+                }
+
+                if (zeroCount > 5)
+                    break;
+            }
+
+            // Put the data into a new byte array using the index
+            byte[] message = new byte[lastNonZero + 1];
+            for (int i = 0; i <= lastNonZero; i++) {
+                message[i] = data[i];
+            }
+
+            for (int i = 0; i < message.Length; i++)
+                Console.Write(message[i] + " ");
+
+            return message;
         }
     }
 }

@@ -38,7 +38,7 @@ namespace NECProjectorController {
             new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },   // Mute On 
             new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },   // Mute Off 
             new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00 }, // Volume Adjust
-            new byte[] { 0x03, 0x8C, 0x00, 0x00, 0x00, 0x8F } // Lamp Information Request 
+            new byte[] { 0x03, 0x9B, 0x00, 0x00, 0x00, 0x9E } // Lamp Information Request 
         };
 
         // Constructor, creates a new connection
@@ -158,6 +158,20 @@ namespace NECProjectorController {
         }
         public bool GetMuteStatus() => isMuted;
 
+        // Get the Lamp Hours
+        public int PollLampHours() {
+            int LampHours = 0;
+            byte[] message = null;
+
+            if (powerStatus) {
+                conn.SendMessage(commands[6]);
+                message = conn.RecieveMessage();
+                LampHours = ParseLampPoll(message);
+            }
+
+            return LampHours;
+        }
+
         // Get the connection status of the controller to the emulator
         public bool GetConnectionStatus() {
             if (conn.GetConnectionStatus())
@@ -166,6 +180,13 @@ namespace NECProjectorController {
                 projectorConnected = false;
 
             return projectorConnected;
+        }
+
+        private int ParseLampPoll(byte[] message) {
+
+
+
+            return 0;
         }
 
         // Get the checksum

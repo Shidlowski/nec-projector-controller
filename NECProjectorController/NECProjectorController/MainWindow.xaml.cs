@@ -172,9 +172,9 @@ namespace NECProjectorController {
                 mutedLabel.Visibility = Visibility.Hidden;
         }
 
-        // Refresh
+        // Refresh -- Mainly to get lamp hours
         private void refreshButton_Click(object sender, RoutedEventArgs e) {
-
+            lampHoursLabel.Content = "Lamp Hours: " + vp.PollLampHours();
         }
     }
 }
