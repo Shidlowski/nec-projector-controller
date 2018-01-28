@@ -25,7 +25,6 @@ namespace NECProjectorController {
         }
 
         // TCP Services
-        private byte[] data;
         private NetworkStream stream;
         TcpClient client;
         IPAddress ipAddress;
@@ -38,10 +37,8 @@ namespace NECProjectorController {
 
             client = new TcpClient();
 
-            // Need a new thread to look for connections
-            System.Threading.Thread connThread;
-            connThread = new System.Threading.Thread(new System.Threading.ThreadStart(StartConnection));
-            connThread.Start();
+            IsConnected = false;
+            StartConnection();
         }
 
         // Singleton get instance
@@ -52,32 +49,21 @@ namespace NECProjectorController {
             return conn;
         }
 
-        // Called through the new thread, runs until a projector is connected
+        // Try and start a new connection
         private void StartConnection() {
-            isConnected = false;
-            while (!isConnected) {
-                try {
-                    client.Connect(endpoint);
-                    Console.WriteLine("Connected to projector...");
-                    IsConnected = true;
-                } catch (System.Net.Sockets.SocketException) {
-                    Console.WriteLine("Searching for connection...");
-                }
-            }
+            client.BeginConnect(ipAddress, PORT, new AsyncCallback(TCP_Connect), client);
+        }
+
+        // Async connect to the server
+        private void TCP_Connect(IAsyncResult ar) {
+            if (!client.Connected) {
+                client.BeginConnect(ipAddress, PORT, new AsyncCallback(TCP_Connect), client);
+            } else
+                IsConnected = true;
         }
 
         // Send a message on to the projector
         public void SendMessage(byte[] command) {
-
-            // Print the command being sent to the projector
-            Console.Write("\nCommand: ");
-            for (int i = 0; i < command.Length; i++) {
-                if (i + 1 == command.Length)
-                    Console.Write(command[i].ToString("X2") + "\n");
-                else
-                    Console.Write(command[i].ToString("X2") + " ");
-            }
-
             stream = client.GetStream();
             stream.Write(command, offset: 0, size: command.Length);
         }

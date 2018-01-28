@@ -24,7 +24,7 @@ namespace NECProjectorController {
             VGA1 = 0x01,
             VGA2 = 0x02,
             Video = 0x06,
-            Component = 0x10,
+            Component = 0x10, // AKA YPbPr
             HDMI1 = 0x1A,
             HDMI2 = 0x1B,
             LAN = 0x20

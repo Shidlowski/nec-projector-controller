@@ -62,12 +62,18 @@ namespace NECProjectorController {
 
         // Check the connection status
         private void CheckConnection() {
-            if (!vp.GetPowerStatus()) {
+            if (!vp.GetConnectionStatus()) {
                 projectorStatusLabel.Visibility = Visibility.Visible;
-                if (!vp.GetConnectionStatus())
-                    projectorStatusLabel.Content = "No Connection Detected (Start Projector)";
-                else
+                projectorStatusLabel.Content = "No Connection Detected (Start Projector)";
+            }
+            else {
+                if(!vp.GetPowerStatus()) {
+                    projectorStatusLabel.Visibility = Visibility.Visible;
                     projectorStatusLabel.Content = "Projector is Off";
+                }
+                else {
+                    projectorStatusLabel.Visibility = Visibility.Hidden;
+                }
             }
         }
 
