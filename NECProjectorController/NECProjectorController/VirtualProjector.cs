@@ -78,19 +78,19 @@ namespace NECProjectorController {
                     case 1: // VGA 2
                         message[6] = (byte)InputList.VGA2;
                         break;
-                    case 3: // Video
+                    case 2: // Video
                         message[6] = (byte)InputList.Video;
                         break;
-                    case 4: // Component
+                    case 3: // Component
                         message[6] = (byte)InputList.Component;
                         break;
-                    case 5: // HDMI 1
+                    case 4: // HDMI 1
                         message[6] = (byte)InputList.HDMI1;
                         break;
-                    case 6: // HDMI 2
+                    case 5: // HDMI 2
                         message[6] = (byte)InputList.HDMI2;
                         break;
-                    case 7: // LAN/Network
+                    case 6: // LAN/Network
                         message[6] = (byte)InputList.LAN;
                         break;
                     default:
