@@ -62,6 +62,9 @@ namespace NECProjectorController {
 
         // Check the connection status
         private void CheckConnection() {
+            // For Debug
+            //Console.WriteLine("Connection Status: {0}", vp.GetConnectionStatus());
+
             if (!vp.GetConnectionStatus()) {
                 projectorStatusLabel.Visibility = Visibility.Visible;
                 projectorStatusLabel.Content = "No Connection Detected (Start Projector)";

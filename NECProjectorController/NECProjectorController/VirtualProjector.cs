@@ -27,7 +27,7 @@ namespace NECProjectorController {
             Component = 0x10, // AKA YPbPr
             HDMI1 = 0x1A,
             HDMI2 = 0x1B,
-            LAN = 0x20
+            LAN = 0x20        // AKA HDBaseT
         };
 
         // List of byte arrays for the commands
@@ -160,7 +160,7 @@ namespace NECProjectorController {
 
         // Get the connection status of the controller to the emulator
         public bool GetConnectionStatus() {
-            if (conn.IsConnected)
+            if (conn.GetConnectionStatus())
                 projectorConnected = true;
             else
                 projectorConnected = false;

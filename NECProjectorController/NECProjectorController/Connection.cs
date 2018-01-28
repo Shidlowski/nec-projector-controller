@@ -57,9 +57,16 @@ namespace NECProjectorController {
         // Async connect to the server
         private void TCP_Connect(IAsyncResult ar) {
             if (!client.Connected) {
-                client.BeginConnect(ipAddress, PORT, new AsyncCallback(TCP_Connect), client);
-            } else
+                StartConnection();
+            } else {
                 IsConnected = true;
+                while (true) {
+                    if(!GetConnectionStatus()) {
+                        StartConnection();
+                        break;
+                    }
+                }
+            }
         }
 
         // Send a message on to the projector
@@ -68,9 +75,31 @@ namespace NECProjectorController {
             stream.Write(command, offset: 0, size: command.Length);
         }
 
+        // Check the connection and set the IsConnected
+        public bool GetConnectionStatus() {
+
+            // Check to see if the client is connected to the server
+            try {
+                if (client.Client.Poll(0, SelectMode.SelectRead)) {
+                    byte[] checkConn = new byte[1];
+                    if (client.Client.Receive(checkConn, SocketFlags.Peek) == 0) {
+                        IsConnected = false;
+                    } else {
+                        IsConnected = true;
+                    }
+                }
+            }
+            catch(System.Net.Sockets.SocketException) {
+                client.Client.Disconnect(true); // Disconnect the TCP Client (to allow reconnection)
+                IsConnected = false;
+            }
+
+            return IsConnected;
+        }
+
         // Recieve a TCP Response
         public void RecieveMessage() {
-
+            
         }
     }
 }
