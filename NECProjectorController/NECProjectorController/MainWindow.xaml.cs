@@ -94,6 +94,10 @@ namespace NECProjectorController {
                     powerButton.Background = (Brush)bc.ConvertFrom("#FF613737");
                     powerButton.Content = "OFF";
                     projectorStatusLabel.Visibility = Visibility.Hidden;
+
+                    // We also want to poll lamp hours when the projector is turned on
+                    lampHoursLabel.Content = "Lamp Hours: " + vp.PollLampHours();
+
                 } else {
                     powerButton.Background = (Brush)bc.ConvertFrom("#FF376150");
                     powerButton.Content = "ON";
@@ -174,7 +178,8 @@ namespace NECProjectorController {
 
         // Refresh -- Mainly to get lamp hours
         private void refreshButton_Click(object sender, RoutedEventArgs e) {
-            lampHoursLabel.Content = "Lamp Hours: " + vp.PollLampHours();
+            if (vp.GetPowerStatus())
+                lampHoursLabel.Content = "Lamp Hours: " + vp.PollLampHours();
         }
     }
 }

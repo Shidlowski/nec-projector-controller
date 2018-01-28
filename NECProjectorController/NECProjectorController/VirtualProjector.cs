@@ -38,7 +38,7 @@ namespace NECProjectorController {
             new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },   // Mute On 
             new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },   // Mute Off 
             new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00 }, // Volume Adjust
-            new byte[] { 0x03, 0x9B, 0x00, 0x00, 0x00, 0x9E } // Lamp Information Request 
+            new byte[] { 0x03, 0x9B, 0x00, 0x00, 0x03, 0x00, 0x00, 0x01, 0xA2 } // Lamp Information Request 
         };
 
         // Constructor, creates a new connection
@@ -165,10 +165,11 @@ namespace NECProjectorController {
 
             if (powerStatus) {
                 conn.SendMessage(commands[6]);
+                System.Threading.Thread.Sleep(500);
                 message = conn.RecieveMessage();
                 LampHours = ParseLampPoll(message);
             }
-
+            Console.WriteLine("Lamp Hours: {0}", LampHours);
             return LampHours;
         }
 
@@ -182,11 +183,12 @@ namespace NECProjectorController {
             return projectorConnected;
         }
 
+        // Convert the Lamp Hour Poll to the Number of Hours
         private int ParseLampPoll(byte[] message) {
+            byte[] data = new byte[] { message[8], message[9], message[10], message[11] };
+            int LampHours = BitConverter.ToInt32(data, 0) / 3600;
 
-
-
-            return 0;
+            return LampHours;
         }
 
         // Get the checksum
