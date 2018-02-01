@@ -40,6 +40,9 @@ namespace NECProjectorController {
             // Any label/component initialization that is needed
             volumeLabel.Content = "Volume: " + vp.GetVolume();
 
+            // Set Volume slider value
+            volumeSlider.Value = vp.GetVolume();
+
             // isMuted is Off normally -- set here so that I can see the label in the editor
             mutedLabel.Visibility = Visibility.Hidden;
         }
@@ -114,6 +117,9 @@ namespace NECProjectorController {
                     // Change selected input to active input
                     (inputWrap.Children[generalInformation[2]] as Button).Background = (Brush)bc.ConvertFrom("#FF5F7D8B");
 
+                    // Set the slider back to the correct value
+                    volumeSlider.Value = vp.GetVolume();
+
                 } else {
                     powerButton.Background = (Brush)bc.ConvertFrom("#FF376150");
                     powerButton.Content = "ON";
@@ -180,6 +186,12 @@ namespace NECProjectorController {
         // Volume Down Handler
         private void volumeDown_Click(object sender, RoutedEventArgs e) {
             vp.DecrementVolume(); // Decrement volume, then change the label
+            volumeLabel.Content = "Volume: " + vp.GetVolume();
+        }
+
+        // This will do the same thing as the volume button
+        private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+            vp.SliderVolume((ushort)volumeSlider.Value);
             volumeLabel.Content = "Volume: " + vp.GetVolume();
         }
 

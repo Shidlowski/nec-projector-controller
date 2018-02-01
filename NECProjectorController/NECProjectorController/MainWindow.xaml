@@ -78,6 +78,7 @@
         <Label x:Name="mutedLabel" Content="*Muted" HorizontalAlignment="Left" Margin="424,389,0,0" VerticalAlignment="Top" Width="104" Foreground="White" Background="{x:Null}" FontFamily="Open Sans" FontSize="10" Padding="0"/>
         <Label x:Name="lampHoursLabel" Content="Lamp Hours: 0" HorizontalAlignment="Left" Margin="272,466,0,0" VerticalAlignment="Top" Width="256" Foreground="White" FontSize="15" Height="20" FontFamily="Open Sans" VerticalContentAlignment="Center" Padding="0" HorizontalContentAlignment="Right"/>
         <Button x:Name="refreshButton" Content="Refresh" HorizontalAlignment="Left" Margin="424,504,0,0" VerticalAlignment="Top" Width="104" Background="White" BorderBrush="{x:Null}" Height="50" FontFamily="Open Sans" FontSize="20" Click="refreshButton_Click"/>
+        <Slider x:Name="volumeSlider" HorizontalAlignment="Left" Margin="404,100,0,0" VerticalAlignment="Top" Height="289" Width="20" FontFamily="Open Sans" Foreground="Black" Background="{x:Null}" Maximum="100" Orientation="Vertical" SmallChange="1" ValueChanged="volumeSlider_ValueChanged"/>
 
 
     </Grid>

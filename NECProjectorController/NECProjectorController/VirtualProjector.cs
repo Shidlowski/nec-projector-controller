@@ -120,6 +120,13 @@ namespace NECProjectorController {
                 SetVolume();
             }
         }
+        // Slider's set volume function
+        public void SliderVolume(int vol) {
+            if (powerStatus) {
+                volume = vol;
+                SetVolume();
+            }
+        }
         // Set the volume
         private void SetVolume() {
             // Volume byte is found at 8
