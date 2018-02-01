@@ -206,17 +206,19 @@ namespace NECProjectorController {
 
         // Refresh get lamp hours, get general information
         private void refreshButton_Click(object sender, RoutedEventArgs e) {
-            
-            if (vp.GetPowerStatus())
+
+            if (vp.GetPowerStatus()) {
                 // Polling specifically the lamp hours
                 lampHoursLabel.Content = "Lamp Hours: " + vp.PollLampHours();
-            
-            // Poll everything else
-            generalInformation = vp.PollGeneralInfo();
 
-            Console.WriteLine("General Information");
-            for (int i = 0; i < generalInformation.Length; i++)
-                Console.Write(generalInformation[i] + " ");
+                // Poll everything else
+                generalInformation = vp.PollGeneralInfo();
+
+                Console.WriteLine("General Information");
+                for (int i = 0; i < generalInformation.Length; i++)
+                    Console.Write(generalInformation[i] + " ");
+
+            }
         }
     }
 }
