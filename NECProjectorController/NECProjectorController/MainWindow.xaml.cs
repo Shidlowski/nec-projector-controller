@@ -16,14 +16,15 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace NECProjectorController {
-
-    // Contoller for the main application window
+    // Controller for the main application window
 
     public partial class MainWindow : Window {
 
-        // Brush converter for hex values
+        // Brush converter for hex values (used with input color setting)
         BrushConverter bc = new BrushConverter();
         private static VirtualProjector vp;
+
+        // Checks for a connection
         private DispatcherTimer dispatcherTimer;
 
         // Used when polling for general info
@@ -33,17 +34,12 @@ namespace NECProjectorController {
         // Initialization
         public MainWindow() {
             InitializeComponent();
-
-            // Create the virtual projector
+            
             vp = new VirtualProjector();
 
-            // Any label/component initialization that is needed
+            // Volume Initialization
             volumeLabel.Content = "Volume: " + vp.GetVolume();
-
-            // Set Volume slider value
             volumeSlider.Value = vp.GetVolume();
-
-            // isMuted is Off normally -- set here so that I can see the label in the editor
             mutedLabel.Visibility = Visibility.Hidden;
         }
 
@@ -69,9 +65,6 @@ namespace NECProjectorController {
 
         // Check the connection status
         private void CheckConnection() {
-            // For Debug
-            //Console.WriteLine("Connection Status: {0}", vp.GetConnectionStatus());
-
             if (!vp.GetConnectionStatus()) {
                 projectorStatusLabel.Visibility = Visibility.Visible;
                 projectorStatusLabel.Content = "No Connection Detected (Start Projector)";
@@ -91,12 +84,12 @@ namespace NECProjectorController {
         private void powerButton_Click(object sender, RoutedEventArgs e) {
             if(vp.GetConnectionStatus()) {
                 bool ps = vp.GetPowerStatus(); // Temporary holder for the powerStatus
-                ps = !ps; // Alternate power status
+                ps = !ps;
 
                 // Change the powerStatus in the virtual object
                 vp.SetPowerStatus(ps);
 
-                // Set the appearance of the power button (Brush)bc.ConvertFrom("#FFXXXXXX")
+                // Set the appearance of the power button
                 if (ps) {
                     powerButton.Background = (Brush)bc.ConvertFrom("#FF613737");
                     powerButton.Content = "OFF";
@@ -110,17 +103,19 @@ namespace NECProjectorController {
                     vp.SetActiveInput(generalInformation[2]);
                     
                     // Since we are setting the active input based on our poll, we also need to update our UI
-                    // Change the color of all inputs to the deselected input color
+                    // by hanging the color of all inputs to the deselected input color, then updating the active input
                     foreach (var children in inputWrap.Children) {
                         (children as Button).Background = (Brush)bc.ConvertFrom("#FF41494D");
                     }
-                    // Change selected input to active input
                     (inputWrap.Children[generalInformation[2]] as Button).Background = (Brush)bc.ConvertFrom("#FF5F7D8B");
 
                     // Set the slider back to the correct value
+                    // If the volume is changed with the slider while the power is off
                     volumeSlider.Value = vp.GetVolume();
 
                 } else {
+                    // Powered off
+
                     powerButton.Background = (Brush)bc.ConvertFrom("#FF376150");
                     powerButton.Content = "ON";
                     projectorStatusLabel.Visibility = Visibility.Visible;
@@ -130,8 +125,6 @@ namespace NECProjectorController {
 
         // Handler for any of the input presses
         private void input_Click(object sender, RoutedEventArgs e) {
-
-            // If the projector is powered on, allow control of inputs
             if (vp.GetPowerStatus()) {
 
                 // Get the Name of the pressed input button
@@ -171,9 +164,6 @@ namespace NECProjectorController {
                     default:
                         break;
                 }
-
-                // Print active input to the console
-                Console.WriteLine(input + ": " + vp.GetActiveInput());
             }
         }
 
@@ -189,7 +179,7 @@ namespace NECProjectorController {
             volumeLabel.Content = "Volume: " + vp.GetVolume();
         }
 
-        // This will do the same thing as the volume button
+        // Volume Slider Handler -- Easier for faster changes
         private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
             vp.SliderVolume((ushort)volumeSlider.Value);
             volumeLabel.Content = "Volume: " + vp.GetVolume();
@@ -204,7 +194,7 @@ namespace NECProjectorController {
                 mutedLabel.Visibility = Visibility.Hidden;
         }
 
-        // Refresh get lamp hours, get general information
+        // Refresh -- get lamp hours, get general information
         private void refreshButton_Click(object sender, RoutedEventArgs e) {
 
             if (vp.GetPowerStatus()) {
@@ -213,11 +203,6 @@ namespace NECProjectorController {
 
                 // Poll everything else
                 generalInformation = vp.PollGeneralInfo();
-
-                Console.WriteLine("General Information");
-                for (int i = 0; i < generalInformation.Length; i++)
-                    Console.Write(generalInformation[i] + " ");
-
             }
         }
     }

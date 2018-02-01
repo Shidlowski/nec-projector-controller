@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace NECProjectorController {
     // The class responsible for handling the TCP Socket/Information passing
+    // Utilizes a singleton design model
 
     class Connection {
-        // Create the singleton object
         private static Connection conn;
         private int PORT = 7142;
         

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace NECProjectorController {
     // This virtual projector object that will be altered by the controller
+    // This allows for easy access to data that has already been polled from the projector
+    // Essentially the Model
 
     class VirtualProjector {
-
-        // Instance Variables
         private bool powerStatus = false;
         private int activeInput = 0;
         private bool isMuted = false;
@@ -32,14 +32,14 @@ namespace NECProjectorController {
 
         // List of byte arrays for the commands
         private List<byte[]> commands = new List<byte[]>() {
-            new byte[] { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 },   // Power On 
-            new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 },   // Power Off 
-            new byte[] { 0x02, 0x03, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00 }, // Input change 
-            new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },   // Mute On 
-            new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },   // Mute Off 
-            new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00 }, // Volume Adjust
-            new byte[] { 0x03, 0x9B, 0x00, 0x00, 0x03, 0x00, 0x00, 0x01, 0xA2 }, // Lamp Information Request 
-            new byte[] { 0x00, 0xC0, 0x00, 0x00, 0x00, 0xC0 } // Common information Request
+            new byte[] { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 },                                  // Power On 
+            new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 },                                  // Power Off 
+            new byte[] { 0x02, 0x03, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00 },                      // Input change 
+            new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },                                  // Mute On 
+            new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },                                  // Mute Off 
+            new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00 },    // Volume Adjust
+            new byte[] { 0x03, 0x9B, 0x00, 0x00, 0x03, 0x00, 0x00, 0x01, 0xA2 },                // Lamp Information Request 
+            new byte[] { 0x00, 0xC0, 0x00, 0x00, 0x00, 0xC0 }                                   // Common information Request
         };
 
         // Constructor, creates a new connection
@@ -129,7 +129,6 @@ namespace NECProjectorController {
         }
         // Set the volume
         private void SetVolume() {
-            // Volume byte is found at 8
             byte[] volumeCommand = commands[5];
 
             // Set the volume byte and checksum to the correct volume
@@ -138,6 +137,8 @@ namespace NECProjectorController {
                 // Get volume byte
                 string v = volume.ToString("X2");
                 byte vol = Convert.ToByte(v, 16);
+                
+                // Volume byte set at index 8
                 volumeCommand[8] = vol;
 
                 // Get checksum byte
@@ -174,7 +175,7 @@ namespace NECProjectorController {
             if (powerStatus) {
                 conn.SendMessage(commands[6]);
                 
-                // Found message passing worked better if I slept the process
+                // Found message passing was more accurate if I slept the process
                 System.Threading.Thread.Sleep(500);
                 message = conn.RecieveMessage();
                 LampHours = ParseLampPoll(message);
@@ -198,9 +199,8 @@ namespace NECProjectorController {
 
             conn.SendMessage(commands[7]);
 
-            // Found message passing worked better if I slept the process
+            // Found message passing more accurate if I slept the process
             System.Threading.Thread.Sleep(500);
-
             message = conn.RecieveMessage();
 
             return ParseGeneralPoll(message);
@@ -226,7 +226,7 @@ namespace NECProjectorController {
             byte[] input = new byte[] { message[11], message[12] };
             int inputId = 999;
 
-            // Get the correct input based on the pairs
+            // Get the correct input based on the pairs message[11] & message[12]
             if(input[0] == 0x01) {
                 if (input[1] == 0x01)
                     inputId = 0;
@@ -247,6 +247,7 @@ namespace NECProjectorController {
                 inputId = 6;
             }
 
+            // Send the data as an array to the Controller
             return new int[] { (ushort)projId, (ushort)power, inputId };
         }
 
