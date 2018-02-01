@@ -26,6 +26,10 @@ namespace NECProjectorController {
         private static VirtualProjector vp;
         private DispatcherTimer dispatcherTimer;
 
+        // Used when polling for general info
+        // General information [projectorId, powerStatus, InputIndex]
+        private int[] generalInformation = new int[3];
+
         // Initialization
         public MainWindow() {
             InitializeComponent();
@@ -97,6 +101,18 @@ namespace NECProjectorController {
 
                     // We also want to poll lamp hours when the projector is turned on
                     lampHoursLabel.Content = "Lamp Hours: " + vp.PollLampHours();
+
+                    // Poll for generalInfo when the power is turned on
+                    generalInformation = vp.PollGeneralInfo();
+                    vp.SetActiveInput(generalInformation[2]);
+                    
+                    // Since we are setting the active input based on our poll, we also need to update our UI
+                    // Change the color of all inputs to the deselected input color
+                    foreach (var children in inputWrap.Children) {
+                        (children as Button).Background = (Brush)bc.ConvertFrom("#FF41494D");
+                    }
+                    // Change selected input to active input
+                    (inputWrap.Children[generalInformation[2]] as Button).Background = (Brush)bc.ConvertFrom("#FF5F7D8B");
 
                 } else {
                     powerButton.Background = (Brush)bc.ConvertFrom("#FF376150");
@@ -176,10 +192,19 @@ namespace NECProjectorController {
                 mutedLabel.Visibility = Visibility.Hidden;
         }
 
-        // Refresh -- Mainly to get lamp hours
+        // Refresh get lamp hours, get general information
         private void refreshButton_Click(object sender, RoutedEventArgs e) {
+            
             if (vp.GetPowerStatus())
+                // Polling specifically the lamp hours
                 lampHoursLabel.Content = "Lamp Hours: " + vp.PollLampHours();
+            
+            // Poll everything else
+            generalInformation = vp.PollGeneralInfo();
+
+            Console.WriteLine("General Information");
+            for (int i = 0; i < generalInformation.Length; i++)
+                Console.Write(generalInformation[i] + " ");
         }
     }
 }

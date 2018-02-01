@@ -13,9 +13,8 @@ namespace NECProjectorController {
         // Create the singleton object
         private static Connection conn;
         private int PORT = 7142;
-
-        // isConnected Properties notify the MainWindow once
-        // the connection status updates
+        
+        // Connection to server status
         private bool isConnected;
         public bool IsConnected {
             get { return isConnected; }
@@ -28,12 +27,10 @@ namespace NECProjectorController {
         private NetworkStream stream;
         TcpClient client;
         IPAddress ipAddress;
-        IPEndPoint endpoint;
 
         // Singleton constructor
         private Connection() {
             ipAddress = IPAddress.Parse("127.0.0.1");
-            endpoint = new IPEndPoint(ipAddress, PORT);
 
             client = new TcpClient();
 
@@ -93,49 +90,47 @@ namespace NECProjectorController {
 
         // Send a message on to the projector
         public void SendMessage(byte[] command) {
-            Console.Write("Sending: ");
-            for (int i = 0; i < command.Length; i++)
-                Console.Write(command[i].ToString("X2") + " ");
-            Console.WriteLine();
-
-            stream = client.GetStream();
-            stream.Write(command, offset: 0, size: command.Length);
+            if(IsConnected) {
+                stream = client.GetStream();
+                stream.Write(command, offset: 0, size: command.Length);
+            }
         }
 
         // Recieve a TCP Response from the server
         public byte[] RecieveMessage() {
-            byte[] data = new byte[1024];
 
-            stream = client.GetStream();
-            stream.Read(data, 0, data.Length);
+            if(IsConnected) {
+                byte[] data = new byte[1024];
 
-            // Get the ending index of the message
-            int zeroCount = 0;
-            int lastNonZero = 0;
-            for (int i = 0; i < data.Length; i++) {
-                if (data[i] == 0)
-                    zeroCount++;
-                else {
-                    lastNonZero = i;
-                    zeroCount = 0;
+                stream = client.GetStream();
+                stream.Read(data, 0, data.Length);
+
+                // Get the ending index of the message
+                int zeroCount = 0;
+                int lastNonZero = 0;
+                for (int i = 0; i < data.Length; i++) {
+                    if (data[i] == 0)
+                        zeroCount++;
+                    else {
+                        lastNonZero = i;
+                        zeroCount = 0;
+                    }
+
+                    if (zeroCount > 5)
+                        break;
                 }
 
-                if (zeroCount > 5)
-                    break;
+                // Put the data into a new byte array using the index
+                byte[] message = new byte[lastNonZero + 1];
+                for (int i = 0; i <= lastNonZero; i++) {
+                    message[i] = data[i];
+                }
+
+                return message;
             }
 
-            // Put the data into a new byte array using the index
-            byte[] message = new byte[lastNonZero + 1];
-            for (int i = 0; i <= lastNonZero; i++) {
-                message[i] = data[i];
-            }
-
-            Console.Write("Recieving: ");
-            for (int i = 0; i < message.Length; i++)
-                Console.Write(message[i].ToString("X2") + " ");
-            Console.WriteLine();
-
-            return message;
+            // Returns an error if the projector isn't connected
+            return new byte[] { 0x00 };
         }
     }
 }

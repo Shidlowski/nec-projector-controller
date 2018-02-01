@@ -38,7 +38,8 @@ namespace NECProjectorController {
             new byte[] { 0x02, 0x12, 0x00, 0x00, 0x00, 0x14 },   // Mute On 
             new byte[] { 0x02, 0x13, 0x00, 0x00, 0x00, 0x15 },   // Mute Off 
             new byte[] { 0x03, 0x10, 0x00, 0x00, 0x05, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00 }, // Volume Adjust
-            new byte[] { 0x03, 0x9B, 0x00, 0x00, 0x03, 0x00, 0x00, 0x01, 0xA2 } // Lamp Information Request 
+            new byte[] { 0x03, 0x9B, 0x00, 0x00, 0x03, 0x00, 0x00, 0x01, 0xA2 }, // Lamp Information Request 
+            new byte[] { 0x00, 0xC0, 0x00, 0x00, 0x00, 0xC0 } // Common information Request
         };
 
         // Constructor, creates a new connection
@@ -125,7 +126,7 @@ namespace NECProjectorController {
             byte[] volumeCommand = commands[5];
 
             // Set the volume byte and checksum to the correct volume
-            if (volume > 0 && !isMuted) {
+            if (volume >= 0 && !isMuted) {
 
                 // Get volume byte
                 string v = volume.ToString("X2");
@@ -165,11 +166,12 @@ namespace NECProjectorController {
 
             if (powerStatus) {
                 conn.SendMessage(commands[6]);
+                
+                // Found message passing worked better if I slept the process
                 System.Threading.Thread.Sleep(500);
                 message = conn.RecieveMessage();
                 LampHours = ParseLampPoll(message);
             }
-            Console.WriteLine("Lamp Hours: {0}", LampHours);
             return LampHours;
         }
 
@@ -183,12 +185,62 @@ namespace NECProjectorController {
             return projectorConnected;
         }
 
+        // Poll common information request 
+        public int[] PollGeneralInfo() {
+            byte[] message = null;
+
+            conn.SendMessage(commands[7]);
+
+            // Found message passing worked better if I slept the process
+            System.Threading.Thread.Sleep(500);
+
+            message = conn.RecieveMessage();
+
+            return ParseGeneralPoll(message);
+        }
+
         // Convert the Lamp Hour Poll to the Number of Hours
         private int ParseLampPoll(byte[] message) {
             byte[] data = new byte[] { message[8], message[9], message[10], message[11] };
             int LampHours = BitConverter.ToInt32(data, 0) / 3600;
 
             return LampHours;
+        }
+
+        // Parse the general information 
+        private int[] ParseGeneralPoll(byte[] message) {
+
+            // If the projector is not connected, send an error
+            if (message.Length == 1)
+                return new int[] { 0x00, 0x00, 0x00 };
+
+            byte projId = message[5];
+            byte power = message[8];
+            byte[] input = new byte[] { message[11], message[12] };
+            int inputId = 999;
+
+            // Get the correct input based on the pairs
+            if(input[0] == 0x01) {
+                if (input[1] == 0x01)
+                    inputId = 0;
+                else if (input[1] == 0x04)
+                    inputId = 2;
+                else
+                    inputId = 4;
+            }
+            else if(input[0] == 0x02) {
+                if (input[1] == 0x01)
+                    inputId = 1;
+                else if (input[1] == 0x04)
+                    inputId = 3;
+                else
+                    inputId = 5;
+            }
+            else {
+                inputId = 6;
+            }
+
+            return new int[] { (ushort)projId, (ushort)power, inputId };
         }
 
         // Get the checksum
